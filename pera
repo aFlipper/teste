@@ -416,21 +416,19 @@
 ;; RETURNS: an image representation of the given world 
 
 (define (draw-world world)
-  (if (number? world)
+  (if (number? world) ;;marcelo
    (place-image START
-                (/ CANVAS-WIDTH 2)
-                (/ CANVAS-HEIGHT 2)
-                BACKGROUND)
+                  (/ CANVAS-WIDTH 2)
+                  (/ CANVAS-HEIGHT 2)
+                      BACKGROUND);;marcelo
    (draw-invaders (world-invaders world)
                  (draw-spaceship (world-spaceship world)
                                  (draw-sbullets (world-sbullets world) 
                                                 (draw-ibullets (world-ibullets world) 
                                                                (draw-lives (world-spaceship world)
                                                                            (draw-score (world-score world)
-                                                                                       (if (= ZERO (spaceship-lives (world-mothership world)))
-                                                                                           BACKGROUND
-                                                                                           (draw-mothership (world-mothership world) 
-                                                                                                            BACKGROUND))))))))))
+                                                                                       (draw-mothership (world-mothership world)
+                                                                                                        BACKGROUND)))))))))
 
 ;;;; Tests
 (check-expect (draw-world WORLD-TEST-DRAW-MSHIP-INIT)
@@ -874,18 +872,18 @@
 ;;;; Function Definition
 (define (key-handler world ke)
   (cond
-    [(and (or(key=? ke "S")(key=? ke "s"))(number? WORLD-ZERO))WORLD-START]
+    [(and (or(key=? ke "S")(key=? ke "s"))(number? world)) WORLD-START] ;;marcelo     
     [(and (spaceship-reach-left-corner? (world-spaceship world)) 
           (key=? ke "right"))
      (make-world (world-invaders world)
-                 (make-spaceship  
+                 (make-spaceship
                   (make-posn (+ 
                               (posn-x (spaceship-position 
                                        (world-spaceship world))) SSHIP-MOVE-UNIT)
                              (posn-y (spaceship-position 
                                       (world-spaceship world))))
                   'right
-                  (spaceship-lives (world-spaceship world)))   
+                  (spaceship-lives (world-spaceship world)))
                  (world-sbullets world)
                  (world-ibullets world)  
                  (world-score world) 
@@ -967,9 +965,9 @@
 
 ;;;; Function Definition
 (define (world-step world)
-  (if (eq? world WORLD-START)
-  world
-  (local ((define invaders
+  (if (number? world)
+      world
+      (local ((define invaders
             (invaders-step world))
           (define remove-lst 
             (filter-sbullets-and-invaders-to-be-removed 
@@ -987,24 +985,23 @@
             (remove-sbullets-or-invaders-after-hit
              invaders
              remove-lst)))
-    
-    (remove-bullets-out-of-bounds-world
-     (make-world invaders-updated
-                 spaceship
-                 sbullets
-                 (move-ibullets
-                  (remove-ibullet-after-hit
-                   spaceship
-                   (invaders-fire 
-                    (random (length invaders))
-                    (world-ibullets world)
-                    invaders)))
-                 (update-score (world-score world)
-                               invaders
-                               invaders-updated
-                               mothership-is-hit)
-                 (+ ONE (world-ticks world))
-                 (mothership-step world mothership-is-hit))))))
+          (remove-bullets-out-of-bounds-world
+          (make-world invaders-updated
+                      spaceship
+                      sbullets
+                     (move-ibullets
+                      (remove-ibullet-after-hit
+                      spaceship
+                      (invaders-fire
+                       (random (length invaders))
+                       (world-ibullets world)
+                       invaders)))
+                     (update-score (world-score world)
+                                   invaders
+                                   invaders-updated
+                                   mothership-is-hit)
+                     (+ ONE (world-ticks world))
+                     (mothership-step world mothership-is-hit))))))
 
 ;;;; Tests
 (check-expect 
@@ -1489,11 +1486,11 @@
                         (/ SPACESHIP-W 2)))
 
 (define (end-game? world)
-   (if (number? world)
-       #f
-  (or (= (spaceship-lives (world-spaceship world)) ZERO)
-      (invaders-reach-btm? (world-invaders world))
-      (eq? (world-invaders world) empty))))
+  (if (number? world)
+      #f
+      (or (= (spaceship-lives (world-spaceship world)) ZERO)
+              (invaders-reach-btm? (world-invaders world))
+              (eq? (world-invaders world) empty))))
 
 ;;;; Tests
 (check-expect (end-game? WORLD-INIT) #false)
@@ -1518,7 +1515,7 @@
   (make-world INVADERS-4-9 SPACESHIP-DEAD 
               empty empty MIN-SCORE TICK-0 MSHIP-INIT))
 
-(define WORLD-ZERO 0)
+(define WORLD-ZERO 0);;marcelo
 
 (define (world-op world)   
   (cond
